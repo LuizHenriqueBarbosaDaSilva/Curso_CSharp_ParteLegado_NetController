@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Curso2Legado___NetController.Models;
+using Curso2Legado___NetController.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Curso2Legado___NetController.Controllers

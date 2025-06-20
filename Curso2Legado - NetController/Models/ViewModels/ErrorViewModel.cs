@@ -1,4 +1,4 @@
-namespace Curso2Legado___NetController.Models
+namespace Curso2Legado___NetController.Models.ViewModels
 {
     public class ErrorViewModel
     {
