@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Curso2Legado___NetController.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<CursoNetContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CursoNetContext") ?? throw new InvalidOperationException("Connection string 'CursoNetContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
