@@ -2,31 +2,34 @@
 using Microsoft.Extensions.DependencyInjection;
 using Curso2Legado___NetController.Data;
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<CursoNetContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("CursoNetContext") ?? throw new InvalidOperationException("Connection string 'CursoNetContext' not found.")));
 
-// Add services to the container.
+// Configura o DbContext com MySQL e migrations num assembly dedicado
+builder.Services.AddDbContext<CursoNetContext>(options =>
+  options.UseMySql(builder.Configuration.GetConnectionString("CursoNetContext"),
+    ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("CursoNetContext")),
+    mysqlOpts => mysqlOpts.MigrationsAssembly("Curso2LegadoNetController")
+  )
+);
+// MVC
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 
 app.Run();
