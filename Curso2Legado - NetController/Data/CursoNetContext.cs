@@ -15,5 +15,7 @@ namespace Curso2Legado___NetController.Data
         }
 
         public DbSet<Curso2Legado___NetController.Models.Departament> Departament { get; set; } = default!;
+        public DbSet<Curso2Legado___NetController.Models.Seller> Seller { get; set; } = default!;
+        public DbSet<Curso2Legado___NetController.Models.SalesRecord> SalesRecord { get; set; } = default!;
     }
 }
