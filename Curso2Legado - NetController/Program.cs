@@ -12,15 +12,26 @@ builder.Services.AddDbContext<CursoNetContext>(options =>
 );
 // MVC
 builder.Services.AddControllersWithViews();
+// Serviços de seeding
+builder.Services.AddScoped<SeedingService>();
 
 var app = builder.Build();
 
 // Pipeline HTTP
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    using (var escopo = app.Services.CreateScope())
+    {
+        var seeder = escopo.ServiceProvider.GetRequiredService<SeedingService>();
+        seeder.Seed();
+    }
+}
+else  
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
