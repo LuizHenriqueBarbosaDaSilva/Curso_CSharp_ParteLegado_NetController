@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Curso2Legado___NetController.Data;
+using Curso2Legado___NetController.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configura o DbContext com MySQL e migrations num assembly dedicado
@@ -14,6 +15,7 @@ builder.Services.AddDbContext<CursoNetContext>(options =>
 builder.Services.AddControllersWithViews();
 // Serviços de seeding
 builder.Services.AddScoped<SeedingService>();
+builder.Services.AddScoped<SellerService>();
 
 var app = builder.Build();
 

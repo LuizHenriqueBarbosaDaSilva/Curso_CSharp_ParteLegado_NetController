@@ -10,6 +10,7 @@
 
         // Conexões 
         public Departament Departament { get; set; }
+        public int DepartamentId { get; set; }
         public ICollection<SalesRecord> SalesList { get; set; } = new List<SalesRecord>();
 
         // Construtores
