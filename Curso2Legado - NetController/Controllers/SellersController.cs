@@ -4,6 +4,7 @@ using Curso2Legado___NetController.Services;
 using Curso2Legado___NetController.Services.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using System.Diagnostics;
 
 namespace Curso2Legado___NetController.Controllers
 {
@@ -13,8 +14,8 @@ namespace Curso2Legado___NetController.Controllers
         private readonly SellerService _sellerService;
         private readonly DepartamentService _departamentService;
         // Construtor
-        public SellersController(SellerService sellerService, DepartamentService departamentService) 
-        { 
+        public SellersController(SellerService sellerService, DepartamentService departamentService)
+        {
             _sellerService = sellerService;
             _departamentService = departamentService;
 
@@ -44,15 +45,15 @@ namespace Curso2Legado___NetController.Controllers
             _sellerService.Insert(seller);
 
             return RedirectToAction(nameof(Index));
-            
+
         }
 
         public IActionResult Delete(int? id)
         {
-            if (id == null) { return NotFound(); }
+            if (id == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi fornecido!" } );  }
 
             var obj = _sellerService.FindById(id.Value);
-            if (obj == null) { return NotFound(); }
+            if (obj == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi encontrado!" } ); }
 
             return View(obj);
         }
@@ -67,21 +68,21 @@ namespace Curso2Legado___NetController.Controllers
 
         public IActionResult Details(int? id)
         {
-            if (id == null) { return NotFound(); }
+            if (id == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi fornecido!" } ); }
 
             var obj = _sellerService.FindById(id.Value);
-            if (obj == null) { return NotFound(); }
+            if (obj == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi encontrado!" } ); }
 
             return View(obj);
         }
 
         public IActionResult Edit(int? id)
         {
-            if(id == null) { return NotFound(); }
+            if (id == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi fornecido!" } ); }
 
             // Testa se esta no banco de dados!
             var obj = _sellerService.FindById(id.Value);
-            if (obj == null) { return NotFound(); };
+            if (obj == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi encontrado!" } ); };
 
             List<Departament> departaments = _departamentService.findAll();
             SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departaments = departaments };
@@ -91,21 +92,32 @@ namespace Curso2Legado___NetController.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Seller seller)
         {
-            if (id != seller.Id) { return BadRequest(); }
+            if (id != seller.Id) { return RedirectToAction(nameof(Error), new { message = "Id diferente! Id mismatch!" }); }
             try
             {
                 _sellerService.Update(seller);
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (NotFoundException)
+            catch (NotFoundException e) 
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = e.Message } );
             }
-            catch(DbConcurrencyException) 
+            catch (ApplicationException e)
+            {
+                return RedirectToAction(nameof(Error), new { message = e.Message });
+            }
+        }
+
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel 
             { 
-                return BadRequest();
-            }
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+
+            return View(viewModel);
         }
     }
 }
