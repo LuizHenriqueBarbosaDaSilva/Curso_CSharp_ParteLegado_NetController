@@ -1,6 +1,9 @@
 ﻿using Curso2Legado___NetController.Models;
+using Curso2Legado___NetController.Models.ViewModels;
 using Curso2Legado___NetController.Services;
+using Curso2Legado___NetController.Services.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace Curso2Legado___NetController.Controllers
 {
@@ -8,8 +11,14 @@ namespace Curso2Legado___NetController.Controllers
     {
         // Injeção de dependencia
         private readonly SellerService _sellerService;
+        private readonly DepartamentService _departamentService;
         // Construtor
-        public SellersController(SellerService sellerService) { _sellerService = sellerService; }
+        public SellersController(SellerService sellerService, DepartamentService departamentService) 
+        { 
+            _sellerService = sellerService;
+            _departamentService = departamentService;
+
+        }
 
         // Corresponde ao metodo GET
         public IActionResult Index()
@@ -21,7 +30,10 @@ namespace Curso2Legado___NetController.Controllers
         // Corresponde ao metodo GET
         public IActionResult Create()
         {
-            return View();
+            var departaments = _departamentService.findAll();
+            var viewModel = new SellerFormViewModel { Departaments = departaments };
+            return View(viewModel);
+
         }
 
         // Corresponde ao metodo POST
@@ -30,8 +42,70 @@ namespace Curso2Legado___NetController.Controllers
         public IActionResult Create(Seller seller)
         {
             _sellerService.Insert(seller);
+
             return RedirectToAction(nameof(Index));
             
+        }
+
+        public IActionResult Delete(int? id)
+        {
+            if (id == null) { return NotFound(); }
+
+            var obj = _sellerService.FindById(id.Value);
+            if (obj == null) { return NotFound(); }
+
+            return View(obj);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            _sellerService.Remove(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Details(int? id)
+        {
+            if (id == null) { return NotFound(); }
+
+            var obj = _sellerService.FindById(id.Value);
+            if (obj == null) { return NotFound(); }
+
+            return View(obj);
+        }
+
+        public IActionResult Edit(int? id)
+        {
+            if(id == null) { return NotFound(); }
+
+            // Testa se esta no banco de dados!
+            var obj = _sellerService.FindById(id.Value);
+            if (obj == null) { return NotFound(); };
+
+            List<Departament> departaments = _departamentService.findAll();
+            SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departaments = departaments };
+            return View(viewModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Seller seller)
+        {
+            if (id != seller.Id) { return BadRequest(); }
+            try
+            {
+                _sellerService.Update(seller);
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+            catch(DbConcurrencyException) 
+            { 
+                return BadRequest();
+            }
         }
     }
 }
