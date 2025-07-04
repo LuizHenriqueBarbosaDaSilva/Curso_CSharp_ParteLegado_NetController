@@ -23,16 +23,16 @@ namespace Curso2Legado___NetController.Controllers
         }
 
         // Corresponde ao metodo GET
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var list = _sellerService.findAll();
+            var list = await _sellerService.findAllAsync();
             return View(list);
         }
 
         // Corresponde ao metodo GET
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var departaments = _departamentService.findAll();
+            var departaments = await _departamentService.findAllAsync();
             var viewModel = new SellerFormViewModel { Departaments = departaments };
             return View(viewModel);
 
@@ -41,25 +41,25 @@ namespace Curso2Legado___NetController.Controllers
         // Corresponde ao metodo POST
         [HttpPost]
         [ValidateAntiForgeryToken] // Para proteger a sessão de ataques!
-        public IActionResult Create(Seller seller)
+        public async Task<IActionResult> Create(Seller seller)
         {
             if (!ModelState.IsValid)
             {
-                var departaments = _departamentService.findAll();
+                var departaments = await _departamentService.findAllAsync();
                 var viewModel = new SellerFormViewModel {  Seller = seller, Departaments = departaments };
                 return View(viewModel);
             }
-            _sellerService.Insert(seller);
+            await _sellerService.InsertAsync(seller);
 
             return RedirectToAction(nameof(Index));
 
         }
 
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi fornecido!" } );  }
 
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             if (obj == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi encontrado!" } ); }
 
             return View(obj);
@@ -67,48 +67,48 @@ namespace Curso2Legado___NetController.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            _sellerService.Remove(id);
+            await _sellerService.RemoveAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi fornecido!" } ); }
 
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             if (obj == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi encontrado!" } ); }
 
             return View(obj);
         }
 
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi fornecido!" } ); }
-
+            
             // Testa se esta no banco de dados!
-            var obj = _sellerService.FindById(id.Value);
+            var obj = await _sellerService.FindByIdAsync(id.Value);
             if (obj == null) { return RedirectToAction(nameof(Error), new { message ="Id não foi encontrado!" } ); };
 
-            List<Departament> departaments = _departamentService.findAll();
+            List<Departament> departaments = await _departamentService.findAllAsync();
             SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departaments = departaments };
             return View(viewModel);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Seller seller)
+        public async Task<IActionResult> Edit(int id, Seller seller)
         {
             if (!ModelState.IsValid)
             {
-                var departaments = _departamentService.findAll();
+                var departaments = await _departamentService.findAllAsync();
                 var viewModel = new SellerFormViewModel { Seller = seller, Departaments = departaments };
                 return View(viewModel);
             }
             if (id != seller.Id) { return RedirectToAction(nameof(Error), new { message = "Id diferente! Id mismatch!" }); }
             try
             {
-                _sellerService.Update(seller);
+                await _sellerService.UpdateAsync(seller);
 
                 return RedirectToAction(nameof(Index));
             }

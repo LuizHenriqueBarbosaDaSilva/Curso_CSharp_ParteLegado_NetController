@@ -28,7 +28,7 @@ namespace Curso2Legado___NetController.Models
         public double BaseSalary { get; set; }
 
         // Conexões 
-        public Departament Departament { get; set; }
+        public Departament? Departament { get; set; }
         [DisplayName("Departamento atribuido")]
         public int DepartamentId { get; set; }
         public ICollection<SalesRecord> SalesList { get; set; } = new List<SalesRecord>();
