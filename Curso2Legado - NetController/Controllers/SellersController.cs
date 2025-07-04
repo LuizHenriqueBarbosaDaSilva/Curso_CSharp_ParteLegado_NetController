@@ -3,6 +3,7 @@ using Curso2Legado___NetController.Models.ViewModels;
 using Curso2Legado___NetController.Services;
 using Curso2Legado___NetController.Services.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol.Plugins;
 using System.Data;
 using System.Diagnostics;
 
@@ -42,6 +43,12 @@ namespace Curso2Legado___NetController.Controllers
         [ValidateAntiForgeryToken] // Para proteger a sessão de ataques!
         public IActionResult Create(Seller seller)
         {
+            if (!ModelState.IsValid)
+            {
+                var departaments = _departamentService.findAll();
+                var viewModel = new SellerFormViewModel {  Seller = seller, Departaments = departaments };
+                return View(viewModel);
+            }
             _sellerService.Insert(seller);
 
             return RedirectToAction(nameof(Index));
@@ -92,6 +99,12 @@ namespace Curso2Legado___NetController.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Seller seller)
         {
+            if (!ModelState.IsValid)
+            {
+                var departaments = _departamentService.findAll();
+                var viewModel = new SellerFormViewModel { Seller = seller, Departaments = departaments };
+                return View(viewModel);
+            }
             if (id != seller.Id) { return RedirectToAction(nameof(Error), new { message = "Id diferente! Id mismatch!" }); }
             try
             {
