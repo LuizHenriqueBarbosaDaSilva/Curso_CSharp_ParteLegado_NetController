@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Curso2Legado___NetController.Data;
 using Curso2Legado___NetController.Services;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configura o DbContext com MySQL e migrations num assembly dedicado
@@ -19,6 +21,16 @@ builder.Services.AddScoped<SellerService>();
 builder.Services.AddScoped<DepartamentService>();
 
 var app = builder.Build();
+
+var enUS = new CultureInfo("en-US");
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en-US"),
+    SupportedCultures = new List<CultureInfo> { enUS },
+    SupportedUICultures = new List<CultureInfo> { enUS }
+};
+
+app.UseRequestLocalization(localizationOptions);
 
 // Pipeline HTTP
 if (app.Environment.IsDevelopment())
